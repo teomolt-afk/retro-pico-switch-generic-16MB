@@ -7,28 +7,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository with Submodules
+      - name: Checkout Code with Submodules
         uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install ARM GCC Toolchain
+      - name: Install ARM GCC Toolchain & Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib build-essential cmake ninja-build python3
-
-      - name: Setup Pico SDK
-        run: |
-          git clone --depth 1 --branch 1.5.1 https://github.com/raspberrypi/pico-sdk.git $HOME/pico-sdk
-          cd $HOME/pico-sdk
-          git submodule update --init
 
       - name: Build Firmware
         run: |
           mkdir build
           cd build
-          cmake -DPICO_SDK_PATH=$HOME/pico-sdk -DPICO_BOARD=pico -DPICO_FLASH_SIZE_BYTES=16777216 ..
+          cmake ..
           make -j$(nproc)
 
       - name: Upload Firmware Artifacts
