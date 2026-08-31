@@ -5,7 +5,7 @@ include($ENV{PICO_SDK_PATH}/tools/CMakeLists.txt)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 set(PICO_CXX_ENABLE_EXCEPTIONS 1)
-set(PICO_BOARD pico_w)
+set(PICO_BOARD generic_rp2040)
 
 project(retro_pico_switch C CXX ASM)
 
