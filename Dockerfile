@@ -1,8 +1,8 @@
-# Docker Image Based on https://github.com/lukstep/raspberry-pi-pico-docker-sdk
-FROM ubuntu:24.10 as build
+FROM ubuntu:22.04 AS builder
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y && \
-    apt-get upgrade -y && \
     apt-get install --no-install-recommends -y \
                        git \
                        ca-certificates \
@@ -12,26 +12,20 @@ RUN apt-get update -y && \
                        gcc-arm-none-eabi \
                        libnewlib-arm-none-eabi \
                        libstdc++-arm-none-eabi-newlib \
-                       cmake && \
+                       cmake \
+                       ninja-build && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Raspberry Pi Pico SDK
-ARG SDK_PATH=/usr/local/picosdk
-RUN git clone --depth 1 --branch 2.0.0 https://github.com/raspberrypi/pico-sdk $SDK_PATH && \
-    cd $SDK_PATH && \
-    git submodule update --init
-
-ENV PICO_SDK_PATH=$SDK_PATH
-
-# Build the Project
-RUN mkdir /app
-WORKDIR /app
+WORKDIR /project
 COPY . .
 
-RUN cmake -B build -DPICO_BOARD=pico_w -S .
-RUN make -C build/
+# Initialize internal submodules if not cloned
+RUN git submodule update --init --recursive || true
 
-# Separate the Binaries for Exporting
-FROM scratch
-COPY --from=build /app/build/src/retro_pico_switch.uf2 /
+RUN mkdir build && cd build && \
+    cmake -DPICO_BOARD=pico -DPICO_FLASH_SIZE_BYTES=16777216 .. && \
+    make -j$(nproc)
+
+FROM scratch AS export-stage
+COPY --from=builder /project/build/*.uf2 /
