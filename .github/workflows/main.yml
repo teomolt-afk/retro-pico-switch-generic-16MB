@@ -13,24 +13,23 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install ARM Toolchain & Dependencies
+      - name: Install ARM GCC Toolchain & Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential cmake ninja-build
+          sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib build-essential cmake ninja-build python3
 
-      - name: Set up Raspberry Pi Pico SDK
-        uses: raspberrypi/pico-sdk-action@v1
-        with:
-          sdk-version: '1.5.1'
+      - name: Clone Raspberry Pi Pico SDK
+        run: |
+          git clone --recurse-submodules https://github.com/raspberrypi/pico-sdk.git $HOME/pico-sdk
 
-      - name: Configure CMake and Build
+      - name: Configure CMake and Build (16MB Target)
         run: |
           mkdir build
           cd build
-          cmake -DPICO_BOARD=pico -DPICO_FLASH_SIZE_BYTES=16777216 ..
+          cmake -DPICO_SDK_PATH=$HOME/pico-sdk -DPICO_BOARD=pico -DPICO_FLASH_SIZE_BYTES=16777216 ..
           make -j$(nproc)
 
-      - name: Upload Firmware
+      - name: Upload Built Firmware
         uses: actions/upload-artifact@v4
         with:
           name: pico-16mb-firmware
