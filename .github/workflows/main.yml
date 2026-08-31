@@ -13,14 +13,26 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Run Docker Container Build
+      - name: Install ARM GCC Toolchain
         run: |
-          docker build \
-            --build-arg CMAKE_ARGS="-DPICO_BOARD=pico -DPICO_FLASH_SIZE_BYTES=16777216" \
-            --output=./output .
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib build-essential cmake ninja-build python3
+
+      - name: Setup Pico SDK
+        run: |
+          git clone --depth 1 --branch 1.5.1 https://github.com/raspberrypi/pico-sdk.git $HOME/pico-sdk
+          cd $HOME/pico-sdk
+          git submodule update --init
+
+      - name: Build Firmware
+        run: |
+          mkdir build
+          cd build
+          cmake -DPICO_SDK_PATH=$HOME/pico-sdk -DPICO_BOARD=pico -DPICO_FLASH_SIZE_BYTES=16777216 ..
+          make -j$(nproc)
 
       - name: Upload Firmware Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: pico-16mb-firmware
-          path: ./output/*.uf2
+          path: build/*.uf2
