@@ -17,14 +17,17 @@ RUN apt-get update -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Clone Pico SDK directly
+RUN git clone --depth 1 --branch 1.5.1 https://github.com/raspberrypi/pico-sdk.git /pico-sdk && \
+    cd /pico-sdk && git submodule update --init
+
+ENV PICO_SDK_PATH=/pico-sdk
+
 WORKDIR /project
 COPY . .
 
-# Initialize internal submodules if not cloned
-RUN git submodule update --init --recursive || true
-
 RUN mkdir build && cd build && \
-    cmake -DPICO_BOARD=pico -DPICO_FLASH_SIZE_BYTES=16777216 .. && \
+    cmake -DPICO_SDK_PATH=/pico-sdk -DPICO_BOARD=pico -DPICO_FLASH_SIZE_BYTES=16777216 .. && \
     make -j$(nproc)
 
 FROM scratch AS export-stage
