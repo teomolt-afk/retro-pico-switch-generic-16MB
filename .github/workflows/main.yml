@@ -13,20 +13,12 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install ARM GCC Toolchain & Dependencies
+      - name: Build with Project Docker
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib build-essential cmake ninja-build python3
+          docker build --output=./output .
 
-      - name: Build Firmware
-        run: |
-          mkdir build
-          cd build
-          cmake ..
-          make -j$(nproc)
-
-      - name: Upload Firmware Artifacts
+      - name: Upload Firmware
         uses: actions/upload-artifact@v4
         with:
           name: pico-16mb-firmware
-          path: build/*.uf2
+          path: ./output/*.uf2
