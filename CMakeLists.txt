@@ -1,4 +1,20 @@
-cmake_minimum_required(VERSION 3.25.1)
+cmake_minimum_required(VERSION 3.12)
+
+# Pull in SDK (search PICO_SDK_PATH first)
+if(DEFINED ENV{PICO_SDK_PATH} AND NOT DEFINED PICO_SDK_PATH)
+    set(PICO_SDK_PATH $ENV{PICO_SDK_PATH})
+endif()
+
+if(PICO_SDK_PATH)
+    include(${PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+else()
+    include(external/pico_sdk_import.cmake)
+endif()
+
+project(retro-pico-switch C CXX ASM)
+
+# Initialize the SDK
+pico_sdk_init()
 
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 include($ENV{PICO_SDK_PATH}/tools/CMakeLists.txt)
