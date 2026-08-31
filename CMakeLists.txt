@@ -15,5 +15,11 @@ project(retro-pico-switch C CXX ASM)
 # Initialize SDK functions
 pico_sdk_init()
 
-add_subdirectory(tools)
-add_subdirectory(src)
+# Conditionally add subdirectories only if they actually exist
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tools/CMakeLists.txt")
+    add_subdirectory(tools)
+endif()
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/CMakeLists.txt")
+    add_subdirectory(src)
+endif()
