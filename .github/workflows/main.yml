@@ -1,0 +1,47 @@
+name: Build UF2 Firmware
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Upgrade to v4 to ensure Node 24 support
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    # Optional: If you use Python to convert binary to UF2
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11' # Use python-version (not python-node)
+
+    # Use modern toolchains for compilation
+    - name: Install ARM Toolchain
+      uses: gcc-arm-embedded/program-arm@v1 
+
+    - name: Install CMake & Build Essentials
+      run: sudo apt-get update && sudo apt-get install -y cmake build-essential
+
+    - name: Setup Pico SDK
+      run: |
+        git clone --depth 1 https://github.com
+        echo "PICO_SDK_PATH=$GITHUB_WORKSPACE/pico-sdk" >> $GITHUB_ENV
+
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build Project
+      run: cmake --build build --config Release
+
+    # Ensure you are on the latest v4 release of artifact management
+    - name: Upload UF2 Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware-uf2
+        path: build/*.uf2   
