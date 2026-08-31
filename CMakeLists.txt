@@ -1,7 +1,4 @@
-
 cmake_minimum_required(VERSION 3.12)
-
-set(PICO_FLASH_SIZE_BYTES 16777216 CACHE STRING "" FORCE)
 
 include(external/pico_sdk_import.cmake)
 
