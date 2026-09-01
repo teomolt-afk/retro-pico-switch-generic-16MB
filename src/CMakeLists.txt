@@ -1,31 +1,33 @@
-# Enable C++ exceptions globally for try/catch in SwitchUsb.cpp
+# Enable C++ exceptions for try/catch blocks
 add_compile_options(-fexceptions)
 
-# Collect all C/C++ source files in src and subdirectories
+# Find all C and C++ source files in src/
 file(GLOB_RECURSE SOURCES 
     "*.cpp" 
     "*.c"
 )
 
-# Exclude Bluetooth source files so it builds purely for wired RP2040
+# Exclude Bluetooth code to stick strictly to wired USB
 list(FILTER SOURCES EXCLUDE REGEX ".*SwitchBluetooth.*")
 
-# Create the main executable target
+# Create the executable binary
 add_executable(retro_pico_switch ${SOURCES})
 
-# Include project headers and SDK headers
+# Add include paths for headers
 target_include_directories(retro_pico_switch PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../include
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# Link SDK libraries directly to the executable target
+# Link SDK libraries and TinyUSB directly to our executable target
 target_link_libraries(retro_pico_switch 
     pico_stdlib 
+    tinyusb_device
+    tinyusb_board
     hardware_pio 
     hardware_gpio 
     hardware_dma
 )
 
-# Generate the final .uf2 binary file
+# Generate the .uf2 file
 pico_add_extra_outputs(retro_pico_switch)
