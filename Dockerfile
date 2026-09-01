@@ -31,4 +31,4 @@ RUN mkdir build && cd build && \
     make -j$(nproc)
 
 FROM scratch AS export-stage
-COPY --from=builder /project/build/*.uf2 /
+COPY --from=builder /project/build/**/*.uf2 /
