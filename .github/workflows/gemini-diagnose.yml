@@ -2,7 +2,7 @@ name: Gemini Build Diagnoser
 
 on:
   workflow_run:
-    workflows: ["Build Firmware"] # Replace with the EXACT name of your build workflow
+    workflows: ["main.yml"] # Replace with the EXACT name of your build workflow
     types:
       - completed
 
