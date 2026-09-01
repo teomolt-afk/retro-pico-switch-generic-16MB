@@ -26,10 +26,9 @@ ENV PICO_SDK_PATH=/pico-sdk
 WORKDIR /project
 COPY . .
 
-# Run single-threaded build to catch exact error location
 RUN mkdir build && cd build && \
     cmake -DPICO_SDK_PATH=/pico-sdk -DPICO_BOARD=pico -DPICO_FLASH_SIZE_BYTES=16777216 .. && \
-    make VERBOSE=1
+    make -j$(nproc)
 
 FROM scratch AS export-stage
-COPY --from=builder /project/build/src/*.uf2 /
+COPY --from=builder /project/build/*.uf2 /
