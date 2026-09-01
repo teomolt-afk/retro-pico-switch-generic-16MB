@@ -1,6 +1,6 @@
 # Options:
 # SWITCH_BLUETOOTH: Remove for USB
-add_compile_definitions(SWITCH_BLUETOOTH)
+# add_compile_definitions(SWITCH_BLUETOOTH)
 add_subdirectory(otherController)
 add_subdirectory(switchController)
 
